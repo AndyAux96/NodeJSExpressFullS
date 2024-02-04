@@ -1,0 +1,38 @@
+create table bddempleados.Departament(
+DepartamentId int AUTO_Increment,
+DepartamentName nvarchar(500),
+PRIMARY KEY(DepartamentId)
+);
+
+insert into bddempleados.Departament(DepartamentName) values ('IT');
+insert into bddempleados.Departament(DepartamentName) values ('Sistemas');
+
+select * from bddempleados.Departament;
+
+Delete from bddempleados.Departament where DepartamentId = 3;
+
+Delete from bddempleados.Departament;
+
+SET SQL_SAFE_UPDATES = 1;
+ALTER TABLE bddempleados.Departament AUTO_INCREMENT = 1; 
+
+
+create table bddempleados.Employee(
+EmployeeId int AUTO_Increment,
+EmployeeName nvarchar(500),
+Departament nvarchar(500),
+DateOfJoining datetime,
+PhotoFileName nvarchar(500),
+PRIMARY KEY(EmployeeId)
+);
+
+insert into bddempleados.Employee(EmployeeName, Departament, DateOfJoining, PhotoFileName) values 
+								('Noro'       , 'IT'       , NOW()       ,'imagen.jpg');
+insert into bddempleados.Employee(DepartamentName) values ('Sistemas');
+
+insert into bddempleados.Employee(EmployeeName, Departament, DateOfJoining, PhotoFileName) values 
+								('Jake'       , 'Sistemas'       , NOW()       ,'imagenJk.jpg');
+
+
+select * from bddempleados.Employee;
+
