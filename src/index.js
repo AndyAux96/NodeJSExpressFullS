@@ -1,5 +1,4 @@
 const Express = require('express');
-const bodyParser = require('body-parser');
 const cors = require('cors');
 const mysql = require('mysql2');
 const fileUpload = require('express-fileupload'); //Subir fotos
@@ -9,24 +8,66 @@ var fs = require('fs'); //Subir fotos
 
 
 var app = Express();
+app.use(cors());
+app.use(Express.json());
 var PORT = 49146;
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+
 
 //Método para subir fotos 
 app.use(fileUpload());
 app.use('/Photos', Express.static(__dirname + '/Photos'));
 
 //Conexión con la BDD
-var conexSql = mysql.createConnection({
+const conexSql = mysql.createConnection({
     host: 'localhost',
     database: 'bddempleados',
     user: 'root',
     password: 'skatesk8'
 });
+//bddvalidación
+app.post('/log', (req, res) => {
+    const sqlquery = "SELECT * FROM bddempleados.usuarios WHERE `email`= ? AND `pass`=?";
+   
+    conexSql.query(sqlquery, [req.body.email,req.body.passx], (err, data) => {
+        if (err) 
+        {
+            return res.json("Fallo en iniciar sesión");
+        }
+        if (data.length > 0) { 
+            return res.json("Exito");
+            //return res.json(data);
+        } else {
+            return res.json("Fallo");
+        }
+        //return res.json(data);
+    });
+})
+app.post('/login',(req,res)=>{
+    const sqlQuery = "SELECT * FROM bddempleados.usuarios WHERE email= ? AND pass=? ";
+    
+    conexSql.query(sqlQuery,[req.body.email,req.body.passx],(err,data)=>{
+        if(err){
+            return res.json("Error");
+        }
+        return res.json(data);
+    }) 
+})
+app.post('/registro',(req,res)=>{
+    const sqlQuery2 = "INSERT INTO bddempleados.usuarios(`email`,`pass`) VALUES (?) ";
+    const values=[
+        req.body.email,
+        req.body.passx
+    ]
+    conexSql.query(sqlQuery2,[values],(err,data)=>{
+        if(err){
+            return res.json("Error");
+        }
+        return res.json(data);
+    })
+})
 
 
-app.use(cors());
+
 
 //Puerto para verificar si conecta
 app.listen(PORT, () => {
@@ -38,8 +79,8 @@ app.listen(PORT, () => {
         }
     });
     console.log(`El servidor esta corriendo en el puerto: http://localhost:${PORT}`);
-
 });
+
 
 app.get('/', (req, res) => {
     res.send('Hello');
@@ -55,6 +96,8 @@ app.get('/api/departament', (req, res) => {
         }
     });
 });
+
+
 
 app.post('/api/departament', (req, res) => {
     var query = `insert into bddempleados.Departament(DepartamentName) VALUE(?)`;
