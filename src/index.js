@@ -20,20 +20,19 @@ app.use('/Photos', Express.static(__dirname + '/Photos'));
 //Conexión con la BDD
 const conexSql = mysql.createConnection({
     host: 'localhost',
-    database: 'bddempleados',
+    database: 'bdd_netflix',
     user: 'root',
     password: 'skatesk8'
 });
 //bddvalidación
 app.post('/log', (req, res) => {
     const sqlquery = "SELECT * FROM bddempleados.usuarios WHERE `email`= ? AND `pass`=?";
-   
-    conexSql.query(sqlquery, [req.body.email,req.body.passx], (err, data) => {
-        if (err) 
-        {
+
+    conexSql.query(sqlquery, [req.body.email, req.body.passx], (err, data) => {
+        if (err) {
             return res.json("Fallo en iniciar sesión");
         }
-        if (data.length > 0) { 
+        if (data.length > 0) {
             return res.json("Exito");
             //return res.json(data);
         } else {
@@ -42,24 +41,47 @@ app.post('/log', (req, res) => {
         //return res.json(data);
     });
 })
-app.post('/login',(req,res)=>{
+app.post('/login', (req, res) => {
     const sqlQuery = "SELECT * FROM bddempleados.usuarios WHERE email= ? AND pass=? ";
-    
-    conexSql.query(sqlQuery,[req.body.email,req.body.passx],(err,data)=>{
-        if(err){
+
+    conexSql.query(sqlQuery, [req.body.email, req.body.passx], (err, data) => {
+        if (err) {
             return res.json("Error");
         }
         return res.json(data);
-    }) 
+    })
 })
-app.post('/registro',(req,res)=>{
+app.get('/correo', (req, res) => {
+    var query = `SELECT Distinct cu.correo FROM bdd_netflix.pedido pe INNER JOIN bdd_netflix.cuenta cu ON pe.Cuenta_idCuenta = cu.idCuenta WHERE pe.Cuenta_idCuenta = 1`;
+    conexSql.query(query, function (err, rows, fields) {
+        if (err) {
+            res.send('fallo en respuesta');
+        } else {
+            res.send(rows);
+        }
+    });
+});
+app.get('/api/employee', (req, res) => {
+    var query = `Select * from bdd_netflix.pedido pe, bdd_netflix.cuenta cu where 
+    pe.Cuenta_idCuenta=cu.idCuenta`;
+    conexSql.query(query, function (err, rows, fields) {
+        if (err) {
+            res.send('fallo en respuesta');
+        } else {
+            res.send(rows);
+        }
+    });
+});
+
+
+app.post('/registro', (req, res) => {
     const sqlQuery2 = "INSERT INTO bddempleados.usuarios(`email`,`pass`) VALUES (?) ";
-    const values=[
+    const values = [
         req.body.email,
         req.body.passx
     ]
-    conexSql.query(sqlQuery2,[values],(err,data)=>{
-        if(err){
+    conexSql.query(sqlQuery2, [values], (err, data) => {
+        if (err) {
             return res.json("Error");
         }
         return res.json(data);
@@ -141,16 +163,6 @@ app.delete('/api/departament/:id', (req, res) => {
     });
 });
 
-app.get('/api/employee', (req, res) => {
-    var query = `select * from bddempleados.Employee`;
-    conexSql.query(query, function (err, rows, fields) {
-        if (err) {
-            res.send('fallo en respuesta');
-        } else {
-            res.send(rows);
-        }
-    });
-});
 
 app.post('/api/employee', (req, res) => {
     var query = `insert into bddempleados.Employee(EmployeeName, Departament, DateOfJoining, PhotoFileName) VALUE(?,?,?,?)`;
